@@ -3,6 +3,8 @@ const sequelize = require("../database");
 const DishCategory = require("./DishCategory");
 const Food = require("./Food");
 const User = require("./User");
+const FavoriteFood = require("./FavoriteFood");
+const ConsumedWater = require("./ConsumedWater");
 
 const Dish = sequelize.define(
   "Dish",
@@ -43,7 +45,7 @@ const DishItem = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
-    food_id: {
+    favorite_food_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
@@ -88,25 +90,56 @@ const DishComment = sequelize.define(
   }
 );
 
-Dish.beforeBulkDestroy(async (options) => {
-  const dishId = options.where.dish_id;
+Dish.beforeDestroy(async (dish, options) => {
   try {
-    const dishItems = await DishItem.findAll({
-      where: { dish_id: dishId },
+    const dishId = dish.dish_id;
+    await DishItem.destroy({ where: { dish_id: dishId } });
+    await DishComment.destroy({ where: { dish_id: dishId } });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+Dish.beforeBulkDestroy(async (options) => {
+  const userId = options.where.user_id;
+  const dishes = await Dish.findAll({ where: { user_id: userId } });
+  await Promise.all(dishes.map((dish) => dish.destroy()));
+});
+
+User.beforeDestroy(async (user, options) => {
+  try {
+    const userId = user.user_id;
+    await Dish.destroy({ where: { user_id: userId } });
+    await DishComment.destroy({ where: { user_id: userId } });
+    await FavoriteFood.destroy({ where: { user_id: userId } });
+    await ConsumedWater.destroy({ where: { user_id: userId } });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+FavoriteFood.beforeDestroy(async (favoriteFood, options) => {
+  try {
+    const id = favoriteFood.favorite_food_id;
+    await DishItem.destroy({
+      where: {
+        favorite_food_id: id,
+      },
     });
-    await Promise.all(dishItems.map((item) => item.destroy()));
   } catch (error) {
     console.log(error);
   }
 });
 
 DishItem.belongsTo(Dish, { foreignKey: "dish_id" });
-DishItem.belongsTo(Food, { foreignKey: "food_id" });
+DishItem.belongsTo(FavoriteFood, { foreignKey: "favorite_food_id" });
+FavoriteFood.hasMany(DishItem, { foreignKey: "favorite_food_id" });
 DishComment.belongsTo(Dish, { foreignKey: "dish_id" });
 DishComment.belongsTo(User, { foreignKey: "user_id" });
 Dish.belongsTo(DishCategory, { foreignKey: "category_id" });
 Dish.belongsTo(User, { foreignKey: "user_id" });
 Dish.hasMany(DishItem, { foreignKey: "dish_id", onDelete: "CASCADE" });
 Dish.hasMany(DishComment, { foreignKey: "dish_id", onDelete: "CASCADE" });
+User.hasMany(Dish, { foreignKey: "user_id" });
 
 module.exports = { Dish, DishItem, DishComment };

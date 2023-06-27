@@ -4,6 +4,7 @@ const Food = require("../models/Food");
 const FoodCategory = require("../models/FoodCategory");
 const { Op } = require("sequelize");
 const User = require("../models/User");
+const FavoriteFood = require("../models/FavoriteFood");
 
 exports.getUserDishes = async (req, res) => {
   try {
@@ -14,6 +15,25 @@ exports.getUserDishes = async (req, res) => {
       },
       include: [
         { model: DishCategory },
+        {
+          model: DishItem,
+          attributes: {
+            exclude: ["dish_id", "favorite_food_id"],
+          },
+          include: {
+            model: FavoriteFood,
+            attributes: {
+              exclude: ["user_id"],
+            },
+            include: {
+              model: Food,
+              attributes: {
+                exclude: ["category_id"],
+              },
+              include: FoodCategory,
+            },
+          },
+        },
         {
           model: DishComment,
           attributes: {
@@ -30,74 +50,74 @@ exports.getUserDishes = async (req, res) => {
             ],
           },
         },
-        {
-          model: DishItem,
-          attributes: {
-            exclude: ["dish_id", "food_id"],
-          },
-          include: {
-            model: Food,
-            attributes: {
-              exclude: ["category_id"],
-            },
-            include: FoodCategory,
-          },
-        },
       ],
     });
 
     if (result.length > 0) {
       const dishes = result.map((dish) => {
         const carbohydrates = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.carbohydrates * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.carbohydrates * item.amount) / 100,
           0
         );
         const protein = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.protein * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.protein * item.amount) / 100,
           0
         );
         const kcal = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.kcal * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.kcal * item.amount) / 100,
           0
         );
         const saturated = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.saturated * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.saturated * item.amount) / 100,
           0
         );
         const monounsaturated = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.saturated * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.saturated * item.amount) / 100,
           0
         );
         const polyunsaturated = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.polyunsaturated * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.polyunsaturated * item.amount) / 100,
           0
         );
         const sodium = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.sodium * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.sodium * item.amount) / 100,
           0
         );
         const iron = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.iron * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.iron * item.amount) / 100,
           0
         );
         const vitaminC = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.vitaminC * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.vitaminC * item.amount) / 100,
           0
         );
         const calcium = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.calcium * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.calcium * item.amount) / 100,
           0
         );
         const potassium = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.potassium * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.potassium * item.amount) / 100,
           0
         );
         const magnesium = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.magnesium * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.magnesium * item.amount) / 100,
           0
         );
         const zinc = dish.DishItems.reduce(
-          (acc, item) => acc + (item.Food.zinc * item.amount) / 100,
+          (acc, item) =>
+            acc + (item.FavoriteFood.Food.zinc * item.amount) / 100,
           0
         );
         dish.vitaminC = vitaminC.toFixed(1);
@@ -145,14 +165,13 @@ exports.createDish = async (req, res) => {
       ...req.body.foods.map((food) => {
         return {
           amount: food.amount,
-          food_id: food.food_id,
+          favorite_food_id: food.favorite_food_id,
           dish_id: dish.dish_id,
         };
       }),
     ];
 
     const dishItems = await DishItem.bulkCreate([...arr]);
-    console.log("teste");
     return res.status(201).json({
       status: "success",
       result: dish,
@@ -172,7 +191,7 @@ exports.updateDish = async (req, res) => {
 
     req.body.foods.forEach(async (food) => {
       const matchingDishItem = dishItems.find(
-        (dishItem) => dishItem.food_id === food.food_id
+        (dishItem) => dishItem.favorite_food_id === food.favorite_food_id
       );
       if (matchingDishItem) {
         if (matchingDishItem.amount !== food.amount) {
@@ -182,7 +201,7 @@ exports.updateDish = async (req, res) => {
       } else {
         promises.push(
           await DishItem.create({
-            food_id: food.food_id,
+            favorite_food_id: food.favorite_food_id,
             amount: food.amount,
             dish_id: req.params.dishId,
           })
@@ -192,7 +211,7 @@ exports.updateDish = async (req, res) => {
 
     dishItems.forEach(async (dishItem) => {
       const matchingFood = req.body.foods.find(
-        (food) => food.food_id === dishItem.food_id
+        (food) => food.favorite_food_id === dishItem.favorite_food_id
       );
       if (!matchingFood) promises.push(await dishItem.destroy());
     });
@@ -206,9 +225,8 @@ exports.updateDish = async (req, res) => {
 
 exports.deleteDish = async (req, res) => {
   try {
-    const result = await Dish.destroy({
-      where: { dish_id: req.params.dishId },
-    });
+    const dish = await Dish.findByPk(req.params.dishId);
+    await dish.destroy();
     return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json(error);

@@ -3,15 +3,6 @@ const bcrypt = require("../bcrypt");
 
 exports.createUser = async (req, res) => {
   try {
-    const existingUser = await User.findOne({
-      where: { email: req.body.email },
-    });
-    if (existingUser) {
-      return res.status(409).json({
-        errorCode: 409,
-        message: "Email já cadastrado!",
-      });
-    }
     const user = await User.create({
       name: req.body.name,
       email: req.body.email,
@@ -74,5 +65,51 @@ exports.getUserByEmail = async (req, res) => {
       errorCode: 404,
       message: "Email ou senha inválido!",
     });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.userId);
+    await user.destroy();
+    return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.userId);
+    if (user) {
+      return res.status(200).json(user);
+    } else {
+      return res.status(404).json({
+        status: "fail",
+        message: "Usuário não encontrado!",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+exports.checkEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        email: req.params.email,
+      },
+    });
+    if (user) {
+      return res.status(409).json({
+        status: "fail",
+        message: "Email já cadastrado!",
+      });
+    } else {
+      return res.sendStatus(200);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
   }
 };

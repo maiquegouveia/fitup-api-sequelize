@@ -8,7 +8,9 @@ router
   .get(favoriteFoodController.getUserFavoritesFood);
 router
   .route("/userId/:userId/food/:foodId")
-  .post(favoriteFoodController.favoriteFood)
+  .post(favoriteFoodController.favoriteFood);
+router
+  .route("/:favoriteFoodId")
   .delete(favoriteFoodController.removeFavoriteFood);
 
 module.exports = router;

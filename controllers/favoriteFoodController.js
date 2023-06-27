@@ -31,8 +31,8 @@ exports.getUserFavoritesFood = async (req, res) => {
 exports.favoriteFood = async (req, res) => {
   try {
     const result = await FavoriteFood.create({
-      user_id: req.params.userId,
-      food_id: req.params.foodId,
+      user_id: +req.params.userId,
+      food_id: +req.params.foodId,
     });
     return res.status(201).json({
       status: "success",
@@ -45,14 +45,10 @@ exports.favoriteFood = async (req, res) => {
 
 exports.removeFavoriteFood = async (req, res) => {
   try {
-    const result = await FavoriteFood.destroy({
-      where: {
-        [Op.and]: [
-          { user_id: req.params.userId },
-          { food_id: req.params.foodId },
-        ],
-      },
+    const favoriteFood = await FavoriteFood.findOne({
+      where: { favorite_food_id: req.params.favoriteFoodId },
     });
+    await favoriteFood.destroy();
     return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json(error);

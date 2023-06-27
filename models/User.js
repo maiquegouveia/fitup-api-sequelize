@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database");
+const nodemailer = require("../nodemailer");
 
 const User = sequelize.define(
   "User",
@@ -52,14 +53,9 @@ User.afterCreate(async (user, options) => {
   const username = `${user.name.replaceAll(" ", "").toLowerCase()}#${
     user.user_id
   }`;
-  await User.update(
-    { username: username },
-    {
-      where: {
-        user_id: user.user_id,
-      },
-    }
-  );
+  user.username = username;
+  await user.save();
+  nodemailer.emailSenderWelcomeMessage(user.email, user.name);
 });
 
 module.exports = User;

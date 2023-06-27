@@ -20,6 +20,9 @@ exports.getUserWaterConsume = async (req, res) => {
   try {
     const result = await ConsumedWater.findAll({
       where: { user_id: req.params.userId },
+      attributes: {
+        exclude: ["user_id"],
+      },
     });
     return res.status(200).json({
       status: "success",

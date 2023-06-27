@@ -6,6 +6,11 @@ const User = require("./User");
 const FavoriteFood = sequelize.define(
   "FavoriteFood",
   {
+    favorite_food_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     food_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -23,5 +28,5 @@ const FavoriteFood = sequelize.define(
 
 FavoriteFood.belongsTo(User, { foreignKey: "user_id" });
 FavoriteFood.belongsTo(Food, { foreignKey: "food_id" });
-
+User.hasMany(FavoriteFood, { foreignKey: "user_id" });
 module.exports = FavoriteFood;
