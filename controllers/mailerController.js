@@ -1,4 +1,4 @@
-const nodeMailer = require("../nodeMailer");
+const nodeMailer = require("../nodemailer");
 
 exports.sendConfirmationCode = async (req, res) => {
   const { email, codeClient } = req.body;
