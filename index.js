@@ -9,6 +9,7 @@ const favoriteFoodRouter = require("./routes/favoriteFoodRoutes");
 const dishRouter = require("./routes/dishRoutes");
 const consumedWaterRouter = require("./routes/consumedWaterRoutes");
 const mailerRoutes = require("./routes/mailerRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 const app = express();
 
 // app.use(morgan("dev"));
@@ -22,6 +23,7 @@ app.use("/api/v3/favoriteFoods", favoriteFoodRouter);
 app.use("/api/v3/dishes", dishRouter);
 app.use("/api/v3/consumedWater", consumedWaterRouter);
 app.use("/api/v3/mailer", mailerRoutes);
+app.use("/api/v3/comments", commentRoutes);
 
 const port = process.env.PORT || 3000;
 
