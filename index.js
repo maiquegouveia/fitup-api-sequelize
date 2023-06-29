@@ -23,7 +23,7 @@ app.use("/api/v3/favoriteFoods", favoriteFoodRouter);
 app.use("/api/v3/dishes", dishRouter);
 app.use("/api/v3/consumedWater", consumedWaterRouter);
 app.use("/api/v3/mailer", mailerRoutes);
-app.use("/api/v3/comments", commentRoutes);
+app.use("/api/v3/contacts", commentRoutes);
 
 const port = process.env.PORT || 3000;
 
