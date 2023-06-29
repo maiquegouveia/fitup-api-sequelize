@@ -1,5 +1,6 @@
 require("dotenv").config({ path: "./config.env" });
 const express = require("express");
+const cors = require("cors");
 const morgan = require("morgan");
 const userRouter = require("./routes/userRoutes");
 const foodCategoryRouter = require("./routes/foodCategoryRoutes");
@@ -13,6 +14,7 @@ const commentRoutes = require("./routes/commentRoutes");
 const app = express();
 
 // app.use(morgan("dev"));
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/v3/users", userRouter);
