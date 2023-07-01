@@ -39,15 +39,14 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.getUserByEmail = async (req, res) => {
-  const { email, password } = req.params;
+exports.authenticateUser = async (req, res) => {
+  const { email, password } = req.body;
   const user = await User.findOne({
     where: { email: email },
   });
   if (user) {
     const result = bcrypt.decrypt(user.password, password);
     if (result) {
-      user.password = password;
       return res.status(200).json({
         status: "success",
         result: user,
