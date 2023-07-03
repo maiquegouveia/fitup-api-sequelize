@@ -118,7 +118,6 @@ exports.updateUser = async (req, res) => {
   try {
     const { id, name, email, phone, password, weight, height } = req.body;
     const oldUser = await User.findByPk(id);
-
     const userCheck = await User.findOne({
       where: {
         [Op.or]: [{ email, phone }],
@@ -149,7 +148,8 @@ exports.updateUser = async (req, res) => {
     oldUser.height = height || null;
     oldUser.email = email;
     oldUser.phone = phone || null;
-    oldUser.password = bcrypt.encrypt(password);
+    oldUser.password =
+      password === "" ? oldUser.password : bcrypt.encrypt(password);
 
     await oldUser.save();
     return res.sendStatus(204);
