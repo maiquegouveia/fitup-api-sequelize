@@ -122,6 +122,9 @@ exports.updateUser = async (req, res) => {
     const userCheck = await User.findOne({
       where: {
         [Op.or]: [{ email, phone }],
+        id: {
+          [Op.not]: id,
+        },
       },
     });
 
