@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("../bcrypt");
+const { Op } = require("sequelize");
 
 exports.createUser = async (req, res) => {
   try {
@@ -110,5 +111,50 @@ exports.checkEmail = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json(error);
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { id, name, email, phone, password, weight, height } = req.body;
+    const oldUser = await User.findByPk(id);
+
+    const userCheck = await User.findOne({
+      where: {
+        [Op.or]: [{ email, phone }],
+      },
+    });
+
+    if (userCheck) {
+      if (userCheck.email === email) {
+        return res.status(409).json({
+          status: "fail",
+          code: 409,
+          message: "Email já cadastrado!",
+        });
+      } else if (userCheck.phone === phone) {
+        return res.status(409).json({
+          status: "fail",
+          code: 409,
+          message: "Telefone já cadastrado!",
+        });
+      }
+    }
+
+    oldUser.name = name;
+    oldUser.weight = weight;
+    oldUser.height = height;
+    oldUser.email = email;
+    oldUser.phone = phone;
+    oldUser.password = bcrypt.encrypt(password);
+
+    await oldUser.save();
+    return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      code: 500,
+      message: "Tente novamente mais tarde!",
+    });
   }
 };
