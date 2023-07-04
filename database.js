@@ -8,6 +8,7 @@ const sequelize = new Sequelize({
   username: config.production.username,
   password: config.production.password,
   logging: false,
+  dialectModule: require("mysql2"),
 });
 
 sequelize.authenticate();
