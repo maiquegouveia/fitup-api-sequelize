@@ -77,7 +77,7 @@ exports.getUserDishes = async (req, res) => {
         );
         const monounsaturated = dish.DishItems.reduce(
           (acc, item) =>
-            acc + (item.FavoriteFood.Food.saturated * item.amount) / 100,
+            acc + (item.FavoriteFood.Food.monounsaturated * item.amount) / 100,
           0
         );
         const polyunsaturated = dish.DishItems.reduce(
