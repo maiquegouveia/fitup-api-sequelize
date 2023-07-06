@@ -13,5 +13,6 @@ router
   .get(userController.getUser)
   .delete(userController.deleteUser);
 router.route("/email/:email").get(userController.checkEmail);
+router.route("/username/:username").get(userController.getUsersByUsername);
 
 module.exports = router;

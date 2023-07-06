@@ -161,3 +161,30 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
+
+exports.getUsersByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const users = await User.findAll({
+      where: {
+        username: {
+          [Op.startsWith]: username,
+        },
+      },
+    });
+    if (users.length > 0) {
+      return res.status(200).json({
+        status: "success",
+        length: users.length,
+        result: users,
+      });
+    } else {
+      return res.status(404).json({
+        status: "fail",
+        message: "Nenhum usuário encontrado!",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
