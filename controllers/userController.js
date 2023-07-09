@@ -188,3 +188,15 @@ exports.getUsersByUsername = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+
+exports.updateProfilePicture = async (req, res) => {
+  try {
+    const { url, userId } = req.body;
+    const user = await User.findByPk(userId);
+    user.profile_picture = url;
+    await user.save();
+    return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};

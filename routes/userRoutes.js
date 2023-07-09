@@ -14,5 +14,6 @@ router
   .delete(userController.deleteUser);
 router.route("/email/:email").get(userController.checkEmail);
 router.route("/username/:username").get(userController.getUsersByUsername);
+router.route("/profilePicture").patch(userController.updateProfilePicture);
 
 module.exports = router;
