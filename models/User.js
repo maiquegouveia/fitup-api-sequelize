@@ -55,7 +55,7 @@ User.afterCreate(async (user, options) => {
   }`;
   user.username = username;
   await user.save();
-  nodemailer.emailSenderWelcomeMessage(user.email, user.name);
+  await nodemailer.emailSenderWelcomeMessage(user.email, user.name);
 });
 
 module.exports = User;
