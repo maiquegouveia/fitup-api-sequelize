@@ -14,7 +14,7 @@ exports.emailSenderAccountConfirmation = async (email, codeClient) => {
   const mailOptions = {
     from: process.env.NODE_MAILER_USER,
     to: email,
-    subject: "Código de Confirmação da Conta",
+    subject: "FitUP - Código de Confirmação da Conta",
     html: `
     <h1>Confirmação de Conta</h1>
     <p>Obrigado pela preferência.</p>
@@ -50,6 +50,37 @@ exports.emailSenderWelcomeMessage = async (email, name) => {
     <p>Obrigado por criar uma conta.</p>
     <p>Estamos felizes em tê-lo(a) conosco!</p>
     <p>Se você tiver alguma dúvida, sinta-se à vontade para entrar em contato conosco.</p>
+    <p>Atenciosamente,</p>
+    <p>A equipe do FitUP</p>
+  `,
+  };
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      error = {
+        error: err,
+      };
+      console.log(err);
+    } else {
+      console.log(`Email sent: ${info.messageId}`);
+    }
+  });
+  return error;
+};
+
+exports.emailSenderAccountRecovery = async (data) => {
+  let error;
+  const { email, name, verificationCode } = data;
+
+  const mailOptions = {
+    from: process.env.NODE_MAILER_USER,
+    to: email,
+    subject: "FitUP - Recuperação de Conta!",
+    html: `
+    <h1>FitUP - Recuperação de Conta</h1>
+    <p>Olá, ${name}!</p>
+    <p>Recebemos uma solicitação para recuperar sua conta FitUP. Para confirmar que você é o proprietário dessa conta, por favor insira o código de verificação abaixo:</p>
+    <h2>${verificationCode}</h2>
+    <p>Se você não solicitou essa recuperação, por favor ignore este email.</p>
     <p>Atenciosamente,</p>
     <p>A equipe do FitUP</p>
   `,
