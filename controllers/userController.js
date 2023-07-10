@@ -200,3 +200,19 @@ exports.updateProfilePicture = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+    if (user) {
+      user.password = bcrypt.encrypt(password);
+      await user.save();
+      return res.sendStatus(204);
+    } else {
+      return res.sendStatus(404);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};

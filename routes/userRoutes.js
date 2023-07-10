@@ -15,5 +15,6 @@ router
 router.route("/email/:email").get(userController.checkEmail);
 router.route("/username/:username").get(userController.getUsersByUsername);
 router.route("/profilePicture").patch(userController.updateProfilePicture);
+router.route("/password").patch(userController.updatePassword);
 
 module.exports = router;
